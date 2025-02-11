@@ -46,30 +46,30 @@ class TranscriptionJob(BaseModel):
     processed_chunks: Optional[int] = 0
 
 class SpeakerAwareTranscriber:
-    def __init__(self, hf_token: str, model_size: str = "tiny"):
+    def __init__(self, hf_token: str, model_size: str = "small"):
         self.hf_token = hf_token
         self.model_size = model_size
         self._initialize_models()
     
     def _setup_device(self) -> str:
         # Force CPU usage
-        return "cpu"
+        return "cuda"
 
     def _initialize_models(self):
         try:
             # Force CPU initialization for diarization
             self.diarization = Pipeline.from_pretrained(
                 "pyannote/speaker-diarization-3.0",
-                # use_auth_token=self.hf_token
-            ).to(torch.device("cpu"))
+                token=self.hf_token
+            ).to(torch.device("cuda"))
 
             # Force CPU initialization for whisper
             self.transcriber = WhisperModel(
                 self.model_size,
-                device="cpu",
+                device="cuda",
                 compute_type="float32"  # Use float32 for CPU
             )
-            print("Models initialized successfully on CPU")
+            print("Models initialized successfully on GPU")
         except Exception as e:
             raise RuntimeError(f"Failed to initialize models: {str(e)}")
 
