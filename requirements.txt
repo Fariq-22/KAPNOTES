@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+uuid
+pydub
+torch
+numpy
+faster-whisper
+pyannote.audio
